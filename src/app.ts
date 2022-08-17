@@ -1,3 +1,12 @@
+// Enums
+enum ProjectStatus {
+  ACTIVE,
+  FINISHED,
+}
+
+// Types
+type Listener = (items: Project[]) => void;
+
 // Interfaces
 interface Validatable {
   value: string | number;
@@ -53,10 +62,20 @@ function Autobind(_: any, _2: string, descriptor: PropertyDescriptor) {
 }
 
 // Classes
+class Project {
+  constructor(
+    public id: string,
+    public title: string,
+    public description: string,
+    public people: number,
+    public status: ProjectStatus
+  ) {}
+}
+
 class ProjectState {
   private static instance: ProjectState;
-  private projects: any[] = [];
-  private listeners: any[] = [];
+  private projects: Project[] = [];
+  private listeners: Listener[] = [];
 
   private constructor() {}
 
@@ -69,12 +88,13 @@ class ProjectState {
   }
 
   addProject(title: string, description: string, numberOfPeople: number) {
-    const newProject = {
-      id: Math.random().toString(),
+    const newProject = new Project(
+      Math.random().toString(),
       title,
       description,
-      people: numberOfPeople,
-    };
+      numberOfPeople,
+      ProjectStatus.ACTIVE
+    );
 
     this.projects.push(newProject);
     for (const listenerFn of this.listeners) {
@@ -82,7 +102,7 @@ class ProjectState {
     }
   }
 
-  addListener(listenerFn: Function) {
+  addListener(listenerFn: Listener) {
     this.listeners.push(listenerFn);
   }
 }
@@ -91,7 +111,7 @@ class ProjectList {
   templateElement: HTMLTemplateElement;
   hostElement: HTMLDivElement;
   listElement: HTMLElement;
-  assignedProjects: any[];
+  assignedProjects: Project[];
 
   constructor(private type: 'active' | 'finished') {
     this.templateElement = document.getElementById(
@@ -108,7 +128,7 @@ class ProjectList {
 
     this.assignedProjects = [];
 
-    projectState.addListener((projects: any[]) => {
+    projectState.addListener((projects: Project[]) => {
       this.assignedProjects = projects;
       this.renderProjects();
     });
