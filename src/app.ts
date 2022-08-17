@@ -53,10 +53,45 @@ function Autobind(_: any, _2: string, descriptor: PropertyDescriptor) {
 }
 
 // Classes
+class ProjectState {
+  private static instance: ProjectState;
+  private projects: any[] = [];
+  private listeners: any[] = [];
+
+  private constructor() {}
+
+  static getInstance() {
+    if (ProjectState.instance) {
+      return this.instance;
+    }
+    this.instance = new ProjectState();
+    return this.instance;
+  }
+
+  addProject(title: string, description: string, numberOfPeople: number) {
+    const newProject = {
+      id: Math.random().toString(),
+      title,
+      description,
+      people: numberOfPeople,
+    };
+
+    this.projects.push(newProject);
+    for (const listenerFn of this.listeners) {
+      listenerFn(this.projects.slice());
+    }
+  }
+
+  addListener(listenerFn: Function) {
+    this.listeners.push(listenerFn);
+  }
+}
+
 class ProjectList {
   templateElement: HTMLTemplateElement;
   hostElement: HTMLDivElement;
   listElement: HTMLElement;
+  assignedProjects: any[];
 
   constructor(private type: 'active' | 'finished') {
     this.templateElement = document.getElementById(
@@ -71,12 +106,30 @@ class ProjectList {
     this.listElement = importedNode.firstElementChild as HTMLElement;
     this.listElement.id = `${this.type}-projects`;
 
+    this.assignedProjects = [];
+
+    projectState.addListener((projects: any[]) => {
+      this.assignedProjects = projects;
+      this.renderProjects();
+    });
+
     this.attach();
     this.renderContent();
   }
 
   private attach() {
     this.hostElement.insertAdjacentElement('beforeend', this.listElement);
+  }
+
+  private renderProjects() {
+    const listElement = document.getElementById(
+      `${this.type}-projects-list`
+    )! as HTMLUListElement;
+    for (const prjItem of this.assignedProjects) {
+      const listItem = document.createElement('li');
+      listItem.textContent = prjItem.title;
+      listElement.appendChild(listItem);
+    }
   }
 
   private renderContent() {
@@ -168,7 +221,8 @@ class ProjectInput {
     event.preventDefault();
     const formInput = this.getFormInputs();
     if (Array.isArray(formInput)) {
-      console.log('formInput::', formInput);
+      const [title, description, people] = formInput;
+      projectState.addProject(title, description, people);
       this.resetForm();
     }
   }
@@ -182,6 +236,8 @@ class ProjectInput {
   }
 }
 
+// Instantiations
+const projectState = ProjectState.getInstance();
 const prjInput = new ProjectInput();
 const activePrjList = new ProjectList('active');
 const finishedPrjList = new ProjectList('finished');
