@@ -117,6 +117,18 @@ class ProjectState extends State<Project> {
     );
 
     this.projects.push(newProject);
+    this.updateListeners();
+  }
+
+  moveProject(projectId: string, newStatus: ProjectStatus) {
+    const project = this.projects.find((project) => project.id === projectId);
+    if (project && project.status !== newStatus) {
+      project.status = newStatus;
+      this.updateListeners();
+    }
+  }
+
+  updateListeners() {
     for (const listenerFn of this.listeners) {
       listenerFn(this.projects.slice());
     }
@@ -263,7 +275,11 @@ class ProjectList
   @Autobind
   dropHandler(event: DragEvent) {
     event.preventDefault();
-    console.log(event.dataTransfer!.getData('text/plain'));
+    const listElement = this.element.querySelector('ul')!;
+    listElement.classList.remove('droppable');
+
+    const projectId = event.dataTransfer!.getData('text/plain');
+    projectState.moveProject(projectId, ProjectStatus[this.type]);
   }
 
   private renderProjects() {
