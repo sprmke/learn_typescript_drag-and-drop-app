@@ -1,10 +1,12 @@
 const path = require('path');
 
 module.exports = {
+  mode: 'development',
   entry: './src/app.ts',
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
+    publicPath: 'dist',
   },
   // to enable source map where we can debug our app on the browser
   devtool: 'inline-source-map',
