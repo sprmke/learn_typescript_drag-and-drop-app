@@ -1,5 +1,7 @@
 import _ from 'lodash';
 
+declare var GLOBAL: string;
+
 export default abstract class Component<
   T extends HTMLElement,
   U extends HTMLElement
@@ -31,6 +33,7 @@ export default abstract class Component<
     this.attach(insertAtStart);
 
     console.log(_.shuffle([1, 2, 3, 4]));
+    console.log(GLOBAL);
   }
 
   private attach(insertAtBeginning: boolean) {
