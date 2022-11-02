@@ -1,4 +1,4 @@
-import Component from './base-component.js';
+import Component from './base-component';
 import * as Validation from '../util/validation';
 import { Autobind as AutobindDecorator } from '../decorators/autobind';
 import { projectState } from '../state/project-state';
