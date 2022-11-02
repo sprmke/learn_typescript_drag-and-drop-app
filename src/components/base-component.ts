@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 export default abstract class Component<
   T extends HTMLElement,
   U extends HTMLElement
@@ -27,6 +29,8 @@ export default abstract class Component<
     }
 
     this.attach(insertAtStart);
+
+    console.log(_.shuffle([1, 2, 3, 4]));
   }
 
   private attach(insertAtBeginning: boolean) {
