@@ -6,7 +6,15 @@ module.exports = {
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
-    publicPath: 'dist',
+    publicPath: '/dist/',
+  },
+  // create a dev server with the new version of webpack
+  devServer: {
+    static: {
+      directory: path.join(__dirname, '/'),
+    },
+    compress: true,
+    port: 3000,
   },
   // to enable source map where we can debug our app on the browser
   devtool: 'inline-source-map',
